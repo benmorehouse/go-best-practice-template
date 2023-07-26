@@ -1,11 +1,10 @@
-# DOCKERFILE used for local containerized development, if that's the route
-# you want to go down!
+# DOCKERFILE used for local containerized development
 
 # Start from the latest golang base image
 FROM golang:latest as builder
 
 # Add Maintainer Info
-LABEL maintainer="Ben Morehouse <ben.morehouse@extra.app>"
+LABEL maintainer="Ben Morehouse <morehouseb18@gmail.com>"
 
 # Set the Current Working Directory inside the container
 WORKDIR /app

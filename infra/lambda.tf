@@ -7,10 +7,10 @@ data "archive_file" "dummy" {
   }
 }
 
-resource "aws_lambda_function" "budget_service" {
+resource "aws_lambda_function" "example_service" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
-  function_name = "budget-service-go"
+  function_name = "example-service-go"
   publish       = true
   role          = aws_iam_role.iam_for_lambda.arn
 
@@ -30,8 +30,8 @@ resource "aws_lambda_function" "budget_service" {
 resource "aws_lambda_alias" "alias" {
   name             = "latest"
   description      = "alias pointing to the latest published version of the lambda"
-  function_name    = aws_lambda_function.budget_service.function_name
-  function_version = aws_lambda_function.budget_service.version
+  function_name    = aws_lambda_function.example_service.function_name
+  function_version = aws_lambda_function.example_service.version
 
   lifecycle {
     ignore_changes = [
@@ -42,23 +42,24 @@ resource "aws_lambda_alias" "alias" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_group" {
-  name = "BudgetServiceLogGroup"
+  name = "ExampleServiceLogGroup"
 
   tags = {
     Environment = "production"
-    Application = "BudgetService"
+    Application = "ExampleService"
   }
 }
 
 data "aws_route53_zone" "zone" {
-  name = "budgetballerz.a.extra.app"
+  # This needs to be replaced with the name of the aws zone you are hosting out of 
+  name = "example-aws-zone.app"
 }
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> 4.0"
 
-  domain_name  = "budget-service-go.budgetballerz.a.extra.app"
+  domain_name  = "example-service-go.benmorehouse.go"
   zone_id      = data.aws_route53_zone.zone.zone_id
 
   wait_for_validation = true
@@ -66,7 +67,7 @@ module "acm" {
 
 resource "aws_route53_record" "api" {
   zone_id = data.aws_route53_zone.zone.zone_id
-  name    = "budget-service-go"
+  name    = "example-service-go"
   type    = "A"
 
   alias {
@@ -77,9 +78,9 @@ resource "aws_route53_record" "api" {
 }
 
 resource "aws_lambda_permission" "lambda_permission" {
-  statement_id  = "budget-service-go-lambda-permission"
+  statement_id  = "example-service-go-lambda-permission"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.budget_service.function_name
+  function_name = aws_lambda_function.example_service.function_name
   principal     = "apigateway.amazonaws.com"
 
   # The /*/*/* part allows invocation from any stage, method and resource path
@@ -92,11 +93,11 @@ resource "aws_lambda_permission" "lambda_permission" {
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
-  name          = "budget-service-go"
-  description   = "Budget Service written in go"
+  name          = "example-service-go"
+  description   = "Example Service written in go"
   protocol_type = "HTTP"
 
-  domain_name                 = "budget-service-go.budgetballerz.a.extra.app"
+  domain_name                 = "example-service-go.benmorehouse.go"
   domain_name_certificate_arn = module.acm.acm_certificate_arn
 
   create_api_domain_name = true
@@ -114,7 +115,7 @@ module "api_gateway" {
   # Routes and integrations
   integrations = {
     "$default" = {
-      lambda_arn = aws_lambda_function.budget_service.arn
+      lambda_arn = aws_lambda_function.example_service.arn
     }
   }
 }

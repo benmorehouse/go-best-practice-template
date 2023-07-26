@@ -9,8 +9,8 @@ import (
 	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 	"github.com/gin-gonic/gin"
 
-	config "budget-service/config"
-	models "budget-service/models"
+	config "github.com/benmorehouse/example-service/config"
+	models "github.com/benmorehouse/example-service/models"
 )
 
 // Server embodies all the central application structure data.
@@ -25,7 +25,8 @@ type Server struct {
 	// Router is the router we run our server through
 	Router *gin.Engine
 
-	BudgetTable models.BudgetRepo
+	// ObjectTable embodies the example table provisioned
+	ObjectTable models.ExampleRepo
 }
 
 // MainLambdaHandler is our main handler, which links initial requests to
@@ -48,8 +49,8 @@ func (s *Server) initRouter() {
 	router := gin.Default()
 	v1 := router.Group("")
 	v1.GET("/status", s.Status)
-	v1.GET("/users/:id/budget", s.GetBudget)
-	v1.POST("/users/:id/budget", s.PostBudget)
+	v1.GET("/users/:id/example", s.GetObject)
+	v1.POST("/users/:id/example", s.PostObject)
 
 	s.Router = router
 }
@@ -59,7 +60,7 @@ func Start() {
 	conf := config.New()
 	s := Server{
 		Config:      conf,
-		BudgetTable: models.NewBudgetRepo(conf.AWSRegion, conf.DynamoHost),
+		ObjectTable: models.NewExampleRepo(conf.AWSRegion, conf.DynamoHost),
 	}
 	s.initRouter()
 

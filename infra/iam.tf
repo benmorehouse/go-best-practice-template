@@ -30,7 +30,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "dynamodb_access" {
-  name = "dynamodb_access_budget_service_go"
+  name = "dynamodb_access_example_service_go"
 
   policy = jsonencode({
     Version = "2012-10-17"
