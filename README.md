@@ -1,6 +1,6 @@
-# 🚀 Golang Lambda Application Example
+# 🚀 Golang Lambda Application Template
 
-This is an example project showcasing the implementation of a Golang application that can be deployed as an AWS Lambda function.
+This is template project showcasing an easy-to-develop and easy-to-deploy application using Go & AWS Lambda.
 
 To use this example, you can directly copy and paste the code here into your own repo and deploy.
 
@@ -14,6 +14,23 @@ For local development, a Dockerfile is provided, enabling you to build and run t
 
 The `./infra` directory contains Terraform files that can be utilized to create AWS resources using Infrastructure 
 as Code (IaC) with Terraform. The deployment process leverages Terraform Cloud.
+
+### Deploying with Terraform and Github Actions
+
+To deploy this application, you first need an AWS Account. Then, you need to create an IAM user with an AWS Access Key and Secret Access Key 
+which has the appropriate IAM policies attached to it (I would personally start with Admin privs and work my way down).
+
+Then, simply take your access and secret access key and export them as variables: 
+
+```sh
+export AWS_ACCESS_KEY_ID="your_access_key"
+export AWS_SECRET_ACCESS_KEY="your_secret_key"
+```
+
+Next, run `terraform plan && terraform apply` and it should create an example lambda function in your aws environment that corresponds to this.
+
+Finally, if you want to have deploys when you merge code using Github Actions, go into ./.github/workflows/deploy.yml
+and replace the AWS Access and Secret access key values with your credentials. I strongly suggest doing so with Github Secrets.
 
 ### Datastore
 
